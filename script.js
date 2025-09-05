@@ -1,3 +1,14 @@
+// Smooth scroll to About section
+function scrollToAbout() {
+    const aboutSection = document.getElementById('about');
+    if (aboutSection) {
+        aboutSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+}
+
 // Neural Network Background Animation
 class NeuralNetwork {
     constructor(canvas) {
@@ -560,11 +571,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const formInputs = document.querySelectorAll('.form-group input, .form-group textarea');
     formInputs.forEach(input => {
         input.addEventListener('focus', function() {
-            this.parentElement.style.transform = 'translateY(-2px)';
+            this.style.transform = 'translateY(-2px)';
         });
         
         input.addEventListener('blur', function() {
-            this.parentElement.style.transform = '';
+            this.style.transform = '';
         });
     });
     
