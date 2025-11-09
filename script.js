@@ -291,7 +291,9 @@ class ThemeManager {
         this.currentTheme = localStorage.getItem('theme') || 'dark';
         
         this.applyTheme(this.currentTheme);
-        this.themeToggle.addEventListener('click', () => this.toggleTheme());
+        if (this.themeToggle) {
+            this.themeToggle.addEventListener('click', () => this.toggleTheme());
+        }
     }
     
     toggleTheme() {
@@ -391,22 +393,42 @@ class ContactForm {
     async handleSubmit(e) {
         e.preventDefault();
         
+        // Honeypot check
+        const honeypot = this.form.querySelector('input[name="bot-field"]');
+        if (honeypot && honeypot.value) {
+            return;
+        }
+        
         const originalText = this.submitBtn.innerHTML;
         this.submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
         this.submitBtn.disabled = true;
         
-        // Simulate form submission
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        this.submitBtn.innerHTML = '<i class="fas fa-check"></i> Message Sent!';
-        this.submitBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-        
-        setTimeout(() => {
-            this.submitBtn.innerHTML = originalText;
-            this.submitBtn.disabled = false;
-            this.submitBtn.style.background = '';
-            this.form.reset();
-        }, 3000);
+        const formData = new FormData(this.form);
+        try {
+            await fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData).toString()
+            });
+            
+            this.submitBtn.innerHTML = '<i class="fas fa-check"></i> Message Sent!';
+            this.submitBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+            
+            setTimeout(() => {
+                this.submitBtn.innerHTML = originalText;
+                this.submitBtn.disabled = false;
+                this.submitBtn.style.background = '';
+                this.form.reset();
+            }, 3000);
+        } catch (error) {
+            this.submitBtn.innerHTML = '<i class="fas fa-triangle-exclamation"></i> Failed. Try again';
+            this.submitBtn.style.background = 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)';
+            setTimeout(() => {
+                this.submitBtn.innerHTML = originalText;
+                this.submitBtn.disabled = false;
+                this.submitBtn.style.background = '';
+            }, 3000);
+        }
     }
 }
 
@@ -543,7 +565,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Certificate items animation on scroll
     const certificateItems = document.querySelectorAll('.certificate-item');
     certificateItems.forEach((item, index) => {
-        item.style.transitionDelay = `${index * 0.2}s`;
+        item.classList.add('slide-in-left');
+        item.style.animationDelay = `${index * 0.3}s`;
+        // Ensure visible in case observer fails
+        item.classList.add('visible');
     });
     
     // Add parallax effect to floating code
