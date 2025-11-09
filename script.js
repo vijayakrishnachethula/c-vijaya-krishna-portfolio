@@ -288,9 +288,10 @@ class SkillConnections {
 class ThemeManager {
     constructor() {
         this.themeToggle = document.getElementById('theme-toggle');
-        this.currentTheme = localStorage.getItem('theme') || 'dark';
-        
-        this.applyTheme(this.currentTheme);
+        // Force dark as default and ignore prior stored preference
+        this.currentTheme = 'dark';
+        localStorage.removeItem('theme');
+        this.applyTheme('dark');
         if (this.themeToggle) {
             this.themeToggle.addEventListener('click', () => this.toggleTheme());
         }
